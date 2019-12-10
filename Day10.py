@@ -13,26 +13,23 @@ def trace_line(x1,y1,x2,y2):
     # slope is zero, collision is along y axis
     if x1 == x2:
         step = 1 if y1 < y2 else -1
-        for y in range(y1, y2+step, step):
+        for y in range(y1+step, y2+step, step):
             #print(x1, y)
             if data[y][x1] == '#':
                 return (x1,y)
 
         return ()
 
-    # slope
     m = (y2 - y1) / (x2 - x1)
-    # axis offset 
     c = y1 - m*x1
 
     step = 1 if x1 < x2 else -1
-    for x in range(x1+step, x2+step, step):
-        y = m*x + c
+    for bruh in range(x1+step, x2+step, step):
+        y = m*bruh + c
+        y = round(y,ndigits=4)
         if y.is_integer():
-            #print (x, int(y))
-
-            if data[int(y)][x] == '#':
-                return (x, int(y))
+            if data[int(y)][bruh] == '#':
+                return (bruh, int(y))
 
     return ()            
 
@@ -60,5 +57,7 @@ def get_max_visible():
                     best_xy = (current_x, current_y)  
 
     return best_xy, best
+
+#compute_observable_asteroids(4,2)
 
 print(get_max_visible())
