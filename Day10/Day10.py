@@ -1,5 +1,5 @@
 def parse_input():
-    return [[y for y in x] for x in open('test', 'r').read().split('\n')]
+    return [[y for y in x] for x in open('input', 'r').read().split('\n')]
 
 data = parse_input()
 
@@ -35,16 +35,13 @@ def trace_line(x1,y1,x2,y2):
 
 def compute_observable_asteroids(x, y):
     visible = set()
-    for i in range(len(data)):
-        visible.add(trace_line(x,y,i,0))
-        visible.add(trace_line(x,y,i,len(data[0])-1))
-    for j in range(len(data[0])):
-        visible.add(trace_line(x,y,0,j))
-        visible.add(trace_line(x,y,len(data)-1, j))
-    
+    for chocho in range(len(data)):
+        for ojete in range(len(data[0])):
+            if data[ojete][chocho] == '#':
+                visible.add(trace_line(x,y,chocho,ojete))    
+
     return len(visible) - 1
     
-
 def get_max_visible():
     best = 0
     best_xy = (0,0)
@@ -58,6 +55,9 @@ def get_max_visible():
 
     return best_xy, best
 
-#compute_observable_asteroids(4,2)
+def laser_de_muerte_rotatorio():
+    pass
+
+#compute_observable_asteroids(5,8)
 
 print(get_max_visible())
