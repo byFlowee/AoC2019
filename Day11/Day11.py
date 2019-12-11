@@ -35,8 +35,8 @@ def write_to(mode, it, b, val):
     if mode == 0:
         program[program[it]] = val
 
-def run(panel, it):
-    r_base = 0
+def run(panel, it, b):
+    r_base = b
     out_count = 0
     out = []
 
@@ -61,7 +61,7 @@ def run(panel, it):
             it += 2
             out_count += 1
             if out_count == 2:
-                return out, it
+                return out, it, r_base
         elif op[0] == 5:
             if get_param(op[2],it+1,r_base) != 0:
                 it = get_param(op[3],it+2,r_base)
@@ -85,7 +85,7 @@ def run(panel, it):
                 write_to(op[4], it+3, r_base, 0)
             it += 4
         elif op[0] == 9 and op[1] == 9:
-            return None, it
+            return None, it, r_base
         elif op[0] == 9:
             r_base += get_param(op[2],it+1,r_base)
             it += 2
@@ -93,13 +93,14 @@ def run(panel, it):
 def painting_robot_thingy():
     x, y = WIDTH//2, HEIGHT//2
     ptr = 0
+    b = 0
     current_dir = Direction.up
     visited = set()
     grid[y][x] = 1
     
     while (True):
-        v, ptr = run(grid[y][x], ptr)
-        print(v)
+        v, ptr, b = run(grid[y][x], ptr, b)
+        #print(v)
         if not v:
             return visited
         
