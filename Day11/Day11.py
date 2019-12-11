@@ -1,14 +1,16 @@
 import time
 from enum import Enum
+import numpy as np
+from matplotlib import pyplot as plt
 
 def parse_input(fname):
     mem = [int(x) for x in open(fname, 'r').read().split(',')]
-    for _ in range(10000):
+    for _ in range(1000):
         mem.append(0)
     return mem
 
-WIDTH  = 10000
-HEIGHT = 10000
+WIDTH  = 3000
+HEIGHT = 3000
 
 class Direction(Enum):
     up = [-1, 0]
@@ -18,7 +20,6 @@ class Direction(Enum):
 
 program = parse_input('Day11/input')
 grid = [[0 for y in range(WIDTH)] for x in range(HEIGHT)]
-
 
 def get_param(mode, it, b):
     if mode == 2:
@@ -33,8 +34,6 @@ def write_to(mode, it, b, val):
         program[b + program[it]] = val
     if mode == 0:
         program[program[it]] = val
-    if mode == 1:
-        program[it] = val
 
 def run(panel, it):
     r_base = 0
@@ -55,7 +54,7 @@ def run(panel, it):
             write_to(op[4], it+3, r_base, get_param(op[2],it+1,r_base) * get_param(op[3],it+2,r_base))
             it += 4
         elif op[0] == 3:
-            write_to(op[2], it+1, r_base, panel)
+            write_to(op[2], it+1, r_base, int(panel))
             it += 2
         elif op[0] == 4:
             out.append(get_param(op[2],it+1,r_base))
@@ -95,13 +94,18 @@ def painting_robot_thingy():
     x, y = WIDTH//2, HEIGHT//2
     ptr = 0
     current_dir = Direction.up
-
+    visited = set()
+    grid[y][x] = 1
+    
     while (True):
-        v, ptr = run(grid[x][y], ptr)
+        v, ptr = run(grid[y][x], ptr)
+        print(v)
         if not v:
-            return
+            return visited
+        
+        visited.add((x,y))
 
-        grid[x][y] = v[0]
+        grid[y][x] = v[0]
 
         if current_dir == Direction.up:
             current_dir = Direction.left if v[1] == 0 else Direction.right
@@ -110,15 +114,15 @@ def painting_robot_thingy():
         elif current_dir == Direction.down:
             current_dir = Direction.right if v[1] == 0 else Direction.left
         elif current_dir == Direction.left:
-            current_dir = Direction.up if v[1] == 0 else Direction.down
+            current_dir = Direction.down if v[1] == 0 else Direction.up
         
-        x += current_dir.value[0]
-        y += current_dir.value[1]
+        y += current_dir.value[0]
+        x += current_dir.value[1]
 
-        
+print(len(painting_robot_thingy()))
 
-        
-painting_robot_thingy()
 
-print(grid)
+grid = np.array(grid)
+plt.imshow(grid)
+plt.show()
 #run(0)
