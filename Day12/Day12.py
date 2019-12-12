@@ -3,54 +3,49 @@ from copy import deepcopy
 from itertools import combinations
 
 class Moon:
-    x = 0
-    y = 0
-    z = 0
-
-    vx = 0
-    vy = 0 
-    vz = 0
 
     def __init__(self, coords):
-        self.x = coords[0]
-        self.y = coords[1]
-        self.z = coords[2]
+        self.coords = [0,0,0]
+        self.speed  = [0,0,0]
+        self.coords[0] = coords[0]
+        self.coords[1] = coords[1]
+        self.coords[2] = coords[2]
 
     def apply_gravity(self, other):
-        if self.x != other.x:
-            grav = 1 if self.x < other.x else -1
-            self.vx += grav
-            other.vx += -grav
+        if self.coords[0] != other.coords[0]:
+            grav = 1 if self.coords[0] < other.coords[0] else -1
+            self.speed[0] += grav
+            other.speed[0] += -grav
 
-        if self.y != other.y:
-            grav = 1 if self.y < other.y else -1
-            self.vy += grav
-            other.vy += -grav
+        if self.coords[1] != other.coords[1]:
+            grav = 1 if self.coords[1] < other.coords[1] else -1
+            self.speed[1] += grav
+            other.speed[1] += -grav
 
-        if self.z != other.z:
-            grav = 1 if self.z < other.z else -1
-            self.vz += grav
-            other.vz += -grav
+        if self.coords[2] != other.coords[2]:
+            grav = 1 if self.coords[2] < other.coords[2] else -1
+            self.speed[2] += grav
+            other.speed[2] += -grav
 
     def apply_velocity(self):
-        self.x += self.vx
-        self.y += self.vy
-        self.z += self.vz
+        self.coords[0] += self.speed[0]
+        self.coords[1] += self.speed[1]
+        self.coords[2] += self.speed[2]
 
     def get_coords(self):
-        return (self.x, self.y, self.z)
+        return (self.coords[0], self.coords[1], self.coords[2])
 
     def get_speed(self):
-        return (self.vx, self.vy, self.vz)
+        return (self.speed[0], self.speed[1], self.speed[2])
 
     def compute_energy(self):
-        return (abs(self.x) + abs(self.y) + abs(self.z)) * (abs(self.vx) + abs(self.vy) + abs(self.vz))
+        return (abs(self.coords[0]) + abs(self.coords[1]) + abs(self.coords[2])) * (abs(self.speed[0]) + abs(self.speed[1]) + abs(self.speed[2]))
 
     def __str__(self):
-        return 'pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>'.format(self.x, self.y, self.z, self.vx, self.vy, self.vz)
+        return 'pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>'.format(self.coords[0], self.coords[1], self.coords[2], self.speed[0], self.speed[1], self.speed[2])
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y and self.z == other.z and self.vx == other.vx and self.vy == other.vy and self.vz == other.vz 
+        return self.coords[0] == other.coords[0] and self.coords[1] == other.coords[1] and self.coords[2] == other.coords[2] and self.speed[0] == other.speed[0] and self.speed[1] == other.speed[1] and self.speed[3] == other.speed[2] 
 
 def parse_input():
     moons = []
@@ -61,40 +56,51 @@ def parse_input():
     return moons
 
 moons = parse_input()
+
+"""
+Part1
+
+for _ in range(1000):
+    for pair in combinations(moons, 2):
+        pair[0].apply_gravity(pair[1])
+
+    for m in moons:
+        m.apply_velocity()
+
+print(sum([m.compute_energy() for m in moons]))
+"""
+
 initial_state = deepcopy(moons)
 
-for pair in combinations(moons, 2):
-    pair[0].apply_gravity(pair[1])
+state = [{}]*3
+cycle = [0]*3
 
-for m in moons:
-    m.apply_velocity()
-
-step = 2
+step = 0
 while(True):
-    skip = False
     for pair in combinations(moons, 2):
         pair[0].apply_gravity(pair[1])
 
     for m in moons:
         m.apply_velocity()
     
-    for m in moons:
-        if m.get_speed() != (0,0,0):
-           break 
-    else:
-        print('cycle, {}'.format(step))
+    for i in range(3):
+        if cycle[i]:
+            continue
+        
+        x = tuple([m.coords[i] for m in moons] + [m.speed[i] for m in moons])
 
-    for m1,m2 in zip(moons, initial_state):
-        if m1 != m2:    
-            skip = True
-            break
+        if x in state[i]:
+            cycle[i] = step
+            print(f'cycle {i} {step}')
+        else:
+            state[i][x] = None
     
-    if not skip:
-        print(step)
+    if all(cycle):
         break
-    
+
     step += 1
+
+
             
-"""
-print(sum([m.compute_energy() for m in moons]))
-"""
+
+
